@@ -1,69 +1,79 @@
-<h1 align="center">
-  <picture>
-    <img src="./src/assets/ntoskrnl-offsets.png" alt="NtoskrnlOffsetDumper" />
-  </picture>
-</h1>
+# ntoskrnl-offsets-dumper
 
-<div align="center">
+Dump Windows kernel offsets from ntoskrnl.exe using Radare2.  
+Works on Windows 10 and Windows 11. Needs Radare2 installed.
 
-![Rust](https://img.shields.io/badge/Rust-EF4A00.svg?style=flat-square)
+## what it does
 
-</div>
+- Grabs offsets for useful kernel structures (EPROCESS, ETHREAD, KTHREAD, KPCR, etc.)
+- Can dump everything with `--all` (every function, variable, struct from the PDB)
+- Outputs as plain text or JSON
+- Supports custom ntoskrnl.exe path and custom PDB file
 
-<h3 align="center">
-  Ntoskrnl.exe Offsets Dumper
-</h3>
+## requirements
 
-<div align="center">
-  <picture>
-    <img src="./src/assets/ntoskrnl-offsets.gif" alt="NtoskrnlOffsetDumper" />
-  </picture>
-</div>
+- Rust (to compile)
+- Radare2 >= 5.0.0 (install from https://github.com/radareorg/radare2/releases)
 
-### 📕 Prerequisites
+## how to build
 
-- [Radare2](https://github.com/radareorg/radare2) - Make sure the environment variable PATH is configured and the Radare2 version is >= 5.0.0
-
-- [Rust](https://www.rust-lang.org/tools/install)
-
-### 📖 Usage
-
-In order to dump those important structs from the system, the script must extract its offsets from the known ntoskrnl.exe file, generally placed at [`C:/Windows/System32/ntoskrnl.exe`](https://github.com/vtorres/ntoskrnl-offsets-dumper/blob/main/src/constants.rs#L3)
-
-This script going to download ntoskrnl PDB, fetches a couple of crucial offsets from it and outputs all the relevant information needed for building your user navigation system with the kernel using the Bring Your Own Vulnerable Driver (A.K.A BYOVD) method for many purposes, like token stealing, handle elevation, thread hijacking and more. In the present moment, the necessary structs we are interested in are the following:
-
-```shell
-_LIST_ENTRY ActiveProcessLinks
-void * UniqueProcessId
-_LIST_ENTRY ThreadListHead
-_PS_PROTECTION Protection
-_EX_FAST_REF Token
-_HANDLE_TABLE* ObjectTable
-_KTRAP_FRAME* TrapFrame
-uint64_t Rip
-_LIST_ENTRY ThreadListEntry
-_CLIENT_ID Cid
-EtwThreatIntProvRegHandle
-_ETW_GUID_ENTRY* GuidEntry
-_TRACE_ENABLE_INFO ProviderEnableInfo
-_GUID Guid
-```
-
-### 🖥️ Development
-
-```shell
-cargo run
-```
-or
-
-```shell
+```cmd
 cargo build --release
 ```
+The exe will be in target\release\ntoskrnl-offsets.exe
 
-### 🏴‍☠️ Credits
+usage examples for every mode
+default mode (63 known offsets)
+```cmd
+cargo run
+```
+json output (default offsets)
+```cmd
+cargo run -- --json
+```
+dump every single symbol (raw radare2 output)
+```cmd
+cargo run -- --all
+```
+dump every symbol as json
+```cmd
+cargo run -- --all --json > all_symbols.json
+```
+custom ntoskrnl.exe path
+```cmd
+cargo run -- --ntoskrnl D:\ntoskrnl_old.exe
+```
+custom ntoskrnl.exe with json
+```cmd
+cargo run -- --ntoskrnl D:\ntoskrnl_old.exe --json
+```
+custom pdb file (skip download)
+```cmd
+cargo run -- --pdb C:\symbols\ntkrnlmp.pdb
+```
+custom pdb with json
+```cmd
+cargo run -- --pdb C:\symbols\ntkrnlmp.pdb --json
+```
+verbose mode (see radare2 output)
+```cmd
+cargo run -- --verbose
+```
+verbose with all symbols
+```cmd
+cargo run -- --all --verbose
+```
+## notes
+The default list has 63 offsets. Some may be missing on your Windows version because Microsoft changes struct layouts.
 
-After reading Kernel Cactus' latest blog post on a boring Sunday, I decided I would go through a coding session to do it.
+--all gives you everything radare2's idpi command outputs. That includes function names, global variables, type info, etc.
 
-- [Kernel Cactus](https://spikysabra.gitbook.io/kernelcactus/)
+Radare2 will try to download the PDB automatically. If that fails, use --pdb with a manually downloaded PDB (via symchk or WinDbg).
 
-- [Vitor Torres](https://github.com/vtorres/)
+Works on both Windows 10 and Windows 11 (tested on 22H2 and later).
+
+## credits
+vtorres (for original project) -> https://github.com/vtorres/ntoskrnl-offsets-dumper
+
+## license
+do whatever you want.
