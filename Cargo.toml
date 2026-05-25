@@ -1,0 +1,19 @@
+[package]
+name = "ntoskrnl-offsets"
+version = "1.0.0"
+edition = "2021"
+
+[dependencies]
+regex = "1.6.0"
+clap = { version = "4.0", features = ["derive"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+[profile.release]
+strip = true
+opt-level = 3
+lto = true
+codegen-units = 1
+
+[profile.release.package."*"]
+opt-level = 3
