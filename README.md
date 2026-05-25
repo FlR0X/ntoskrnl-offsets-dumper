@@ -75,5 +75,6 @@ Works on both Windows 10 and Windows 11 (tested on 22H2 and later).
 ## credits
 vtorres (for original project) -> https://github.com/vtorres/ntoskrnl-offsets-dumper
 
-## license
-do whatever you want.
+## showcase (Windows 10 22H2 (OS Build 19045.6466)
+<img width="638" height="835" alt="image" src="https://github.com/user-attachments/assets/fa78f8dd-3387-4d5f-801d-f332dd79ea03" />
+
